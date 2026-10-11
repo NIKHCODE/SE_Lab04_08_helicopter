@@ -6,6 +6,7 @@ held Up/Down keys.
 import pygame
 
 THRUST = 0.4
+MAX_SPEED = 2.4
 
 
 class Helicopter:
@@ -17,17 +18,19 @@ class Helicopter:
         self.vy = 0.0
 
     def handle_input(self, keys_pressed):
-        if keys_pressed[pygame.K_UP]:
-            self.vy -= THRUST
-        if keys_pressed[pygame.K_DOWN]:
-            self.vy += THRUST
+        direction = int(keys_pressed[pygame.K_DOWN]) - int(keys_pressed[pygame.K_UP])
+        self.vy = max(-MAX_SPEED, min(MAX_SPEED, self.vy + direction * THRUST))
 
     def update(self, height_bound):
         self.y += self.vy
-        if self.y < 0:
-            self.y = 0
+        min_y = self.height / 2
+        max_y = height_bound - self.height / 2
+        if self.y < min_y:
+            self.y = min_y
             self.vy = 0
-        # NOTE: no corresponding check against the bottom boundary
+        elif self.y > max_y:
+            self.y = max_y
+            self.vy = 0
 
     def get_rect(self):
         return pygame.Rect(
